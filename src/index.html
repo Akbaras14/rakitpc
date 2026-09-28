@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Bengkel Coding — Rakit PC Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{--ink:#20221f;--muted:#858b81;--lime:#b8e06f;--paper:#e9e8e3;--line:#d0d2ca}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:12px Arial,sans-serif}button{font:inherit;cursor:pointer}
+    .app{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-height:100vh}.stage{position:relative;min-height:100vh;overflow:hidden;background:radial-gradient(circle at 50% 46%,#4b504c,#262a28 58%,#141615)}
+    #scene{display:block;width:100%;height:100%;min-height:100vh}.top{position:absolute;z-index:2;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:32px 42px;color:#f3f4ee}.eyebrow,.label{font-size:10px;font-weight:bold;letter-spacing:.15em;color:#9aa198}.top h1{margin:12px 0 0;font-size:clamp(26px,3vw,46px);line-height:.95;letter-spacing:-.06em}.top a{color:#f3f4ee;text-decoration:none;border-bottom:1px solid #778078;padding-bottom:7px}.hint{position:absolute;z-index:2;bottom:26px;left:42px;color:#d9ddd5;font-size:11px}.hint i{display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:var(--lime);box-shadow:0 0 14px var(--lime)}
+    .empty{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#d8ddd5;pointer-events:none}.empty b{display:block;margin-bottom:14px;color:var(--lime);font-size:54px;font-weight:normal}.empty p{margin:0;font-size:16px;font-weight:bold}.empty small{display:block;margin-top:8px;color:#979e95}
+    aside{display:flex;flex-direction:column;gap:28px;padding:30px 31px 22px;background:var(--paper)}.brand{display:flex;align-items:center;gap:9px;font-weight:bold;letter-spacing:.08em}.brand b{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--lime);font-size:15px}.badge{margin-left:auto;padding:5px 7px;border:1px solid #c3c6bd;border-radius:3px;color:#777c73;font-size:8px;letter-spacing:.1em}.copy h2{margin:14px 0 0;font-size:39px;line-height:.91;letter-spacing:-.07em}.copy h2 em{color:#779d41;font-style:normal}.copy p{max-width:280px;margin:16px 0 0;color:#777b73;font-size:11px;line-height:1.55}.label{display:flex;gap:10px;padding-bottom:11px;border-bottom:1px solid var(--line)}.label span{color:#779d41}.label strong{margin-left:auto;color:var(--ink)}.option{display:flex;align-items:center;gap:11px;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}.option input{display:none}.radio{width:13px;height:13px;border:1px solid #a4aa9e;border-radius:50%}.option.active .radio{border:4px solid var(--lime);background:var(--ink)}.option div{display:grid;gap:4px;flex:1}.option small,.current{color:#7e837a;font-size:10px}.arrow{color:#88907f;font-size:17px}.parts{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-top:13px}.parts span{padding:8px;border:1px solid var(--line);color:#666c63;font-size:9px}.track{height:4px;margin-top:14px;background:var(--line)}.track i{display:block;height:100%;background:#779d41;transition:width .25s}.current{margin:9px 0 0}.actions{margin-top:auto}.primary,.secondary{display:flex;justify-content:space-between;width:100%;padding:16px 17px;border:0;background:var(--ink);color:#f0f1eb;font-weight:bold;text-align:left}.secondary{background:#779d41}.reset{display:block;margin:13px auto 0;border:0;background:transparent;color:#777c73;font-size:10px;text-decoration:underline}.foot{display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid var(--line);color:#9a9e95;font-size:9px}.help{border:0;background:transparent;color:#656b61;font-size:10px}.helpbox{position:absolute;right:31px;bottom:63px;width:230px;padding:15px;border:1px solid #c7cbc0;background:#f4f3ee;box-shadow:0 10px 30px #20221f22;font-size:11px}.helpbox p{margin:8px 0 0;color:#70766d;line-height:1.5}
+    [hidden]{display:none!important}
+    :root{--ink:#f2f8ff;--muted:#91a9c8;--lime:#20dfff;--paper:#07152b;--line:#174b86;--electric:#087fff;--blue-deep:#051126}
+    body{background:var(--blue-deep);color:var(--ink)}
+    .stage{height:100vh;min-width:0;background:radial-gradient(ellipse at 54% 38%,#123a69 0%,#082447 38%,#041126 78%,#020814 100%)}
+    aside{position:relative;isolation:isolate;gap:25px;overflow:hidden;border-left:1px solid #1477cf;background:linear-gradient(155deg,#0d2544 0%,#07162d 46%,#040e20 100%);color:#eff7ff}
+    aside:before{position:absolute;z-index:-1;top:-190px;right:-190px;width:390px;height:390px;border:1px solid #147fff35;border-radius:50%;box-shadow:0 0 80px #087fff22,inset 0 0 80px #087fff12;content:""}
+    aside:after{position:absolute;z-index:-1;right:24px;bottom:78px;width:80px;height:1px;background:linear-gradient(90deg,transparent,#14dfff,transparent);box-shadow:0 0 18px #14dfff;content:""}
+    .brand{color:#f3f8ff;font-size:11px}.brand img{width:30px;height:30px;border:1px solid #19dfff;border-radius:8px;box-shadow:0 0 18px #087fff66}
+    .badge{border-color:#1675c4;color:#82dfff;background:#071b35}
+    .eyebrow,.label{color:#7eafd9}.label{border-color:#174b86}.label span{color:#16dfff}.label strong{color:#eaf6ff}
+    .copy h2{color:#f4f9ff}.copy h2 em{color:#11dfff;text-shadow:0 0 24px #0b8dff66}.copy p{color:#a5bdd8}
+    .option{border-color:#153b66;color:#edf6ff;transition:background .18s,border-color .18s,padding .18s}.option:hover,.option.active{padding-right:10px;padding-left:10px;border-color:#138dff;background:linear-gradient(90deg,#087fff22,#11dfff08)}.option.active .radio{border-color:#18dfff;background:#087fff;box-shadow:0 0 12px #0dbbff99}.option small,.current{color:#9cb6d3}.arrow{color:#19dfff}
+    .parts span{border-color:#174b86;background:#091c36;color:#b9d9f5}.track{background:#102d50}.track i{background:linear-gradient(90deg,#087fff,#18e4ff);box-shadow:0 0 12px #12bbff88}
+    .primary,.secondary{border:1px solid #168fff;background:linear-gradient(105deg,#0867e8,#0e9dff 65%,#13caff);box-shadow:0 5px 24px #087fff33;color:white;transition:filter .18s,transform .18s}.primary:hover,.secondary:hover{filter:brightness(1.16);transform:translateY(-1px)}.secondary{background:linear-gradient(105deg,#087fd2,#10cfe8)}
+    .reset,.help{color:#9cc8ee}.foot{border-color:#174b86;color:#7e9fbd}.helpbox{border-color:#1675c4;background:#0a1d38;color:#eef8ff;box-shadow:0 12px 35px #01081299}.helpbox p{color:#adc4df}
+    .top{color:#f5faff}.top h1{text-shadow:0 2px 22px #42a6ff66}.top a{border-color:#1bbcff;color:#c9eaff}.empty{color:#d9f5ff}.empty b{color:#12dfff;text-shadow:0 0 34px #058fff}.empty small{color:#a4c0db}.hint{color:#d9f3ff}.hint i{background:#50ff86;box-shadow:0 0 14px #50ff86}
+    .welcome{position:absolute;inset:105px 5% 8%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;pointer-events:none}
+    .welcome[hidden]{display:none}
+    .speech{position:relative;width:min(680px,92%);overflow:hidden;padding:15px 20px;border:1px solid #16cfff88;border-radius:16px;background:#03142bd9;color:#e9faff;box-shadow:0 0 28px #008dff35,inset 0 0 20px #078bff13}
+    .speech:after{position:absolute;left:calc(50% - 10px);bottom:-14px;width:20px;height:15px;background:#03142b;clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 2px 0 #16cfff88);content:""}
+    .speech-label{display:block;margin-bottom:8px;color:#19dfff;font-size:9px;font-weight:bold;letter-spacing:.16em}
+    .marquee{overflow:hidden;white-space:nowrap;font-size:clamp(12px,1.5vw,16px);font-weight:600}
+    .marquee span{display:inline-block;padding-left:100%;animation:welcome-scroll 30s linear infinite}
+    @keyframes welcome-scroll{to{transform:translateX(-100%)}}
+    .welcome-gif{display:block;width:min(370px,55%);max-height:42vh;object-fit:contain;filter:drop-shadow(0 0 28px #078fff55)}
+    .assembly-guide{position:absolute;z-index:4;left:20px;bottom:16px;display:flex;align-items:flex-end;gap:16px;width:min(900px,calc(100% - 40px));pointer-events:none}
+    .assembly-guide[hidden]{display:none}
+    .guide-avatar{flex:0 0 auto;width:clamp(170px,24vw,280px);max-height:320px;object-fit:contain;filter:drop-shadow(0 0 26px #087fff85)}
+    .guide-bubble{position:relative;max-width:540px;padding:26px 29px;border:1px solid #16cfffaa;border-radius:22px;background:#03142bf7;color:#e9faff;box-shadow:0 0 36px #008dff55;line-height:1.55}
+    .guide-bubble:before{position:absolute;left:-13px;bottom:32px;width:22px;height:22px;transform:rotate(45deg);border-left:1px solid #16cfffaa;border-bottom:1px solid #16cfffaa;background:#03142b;content:""}
+    .guide-name{display:block;margin-bottom:11px;color:#19dfff;font-size:20px;font-weight:700}
+    .guide-description{display:block;color:#c5dff6;font-size:17px}
+    .assembly-guide.complete .guide-avatar{animation:success-blink .8s ease-in-out infinite alternate}
+    .assembly-guide.complete .guide-bubble{animation:bubble-blink .8s ease-in-out infinite alternate}
+    @keyframes success-blink{from{filter:drop-shadow(0 0 12px #087fff70)}to{filter:drop-shadow(0 0 34px #18efff) brightness(1.18)}}
+    @keyframes bubble-blink{from{border-color:#16cfff88;box-shadow:0 0 16px #008dff35}to{border-color:#8effff;box-shadow:0 0 38px #16dfffaa}}
+    .annotations{position:absolute;z-index:3;inset:0;pointer-events:none}
+    .annotations[hidden]{display:none}
+    .annotation-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+    .annotation-lines line{stroke:#31e6ff;stroke-width:1.5;filter:drop-shadow(0 0 4px #078fff)}
+    .annotation-lines circle{fill:#9affff;stroke:#087fff;stroke-width:2}
+    .annotation{position:absolute;width:clamp(116px,15vw,190px);padding:8px 10px;border:1px solid #17cfff88;border-radius:9px;background:#04152beF;color:#e9faff;box-shadow:0 0 18px #078fff30;transform:translateY(-50%)}
+    .annotation.right{right:12px}.annotation.left{left:12px}
+    .annotation b{display:block;margin-bottom:3px;color:#25e3ff;font-size:11px}
+    .annotation span{display:block;color:#c5dff6;font-size:9px;line-height:1.35}
+    @media(max-width:600px){.annotation{width:clamp(108px,35vw,150px);padding:6px 7px}.annotation b{font-size:9px}.annotation span{font-size:8px}.annotation.right{right:6px}.annotation.left{left:6px}}
+    #scene{position:absolute;inset:0;min-height:0;touch-action:none}
+    .brand img{width:25px;height:25px;border-radius:50%;object-fit:cover}
+    @media(max-width:850px){.app{display:block}.stage{height:58vh;min-height:58vh}.top{padding:24px}.hint{left:24px}aside{min-height:42vh;padding:24px}.copy h2{font-size:32px}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="stage"><div class="top"><div><div class="eyebrow">ARSITECTURE DAN ORGANISASI KOMPUTER</div><h1>Rakit PC bersama Bengkel Coding</h1></div><a href="javascript:location.reload()">Reset ↗</a></div><canvas id="scene"></canvas><div class="welcome" id="welcome"><div class="speech"><span class="speech-label">BENGKEL CODING MENYAPA</span><div class="marquee"><span>Halo Teman Teman perkenalkan saya bengkel coding mari belajar arsitektur komputer dengan cara merakit komputer pc, silahkan pilih preset pada sidebar sebelah kanan.</span></div></div><img class="welcome-gif" src="assets/gif/bengkelcoding.gif" alt="Animasi Bengkel Coding"></div><div class="annotations" id="annotations" hidden><svg class="annotation-lines" id="annotationLines"></svg><div id="annotationLabels"></div></div><div class="assembly-guide" id="assemblyGuide" hidden><img class="guide-avatar" src="assets/gif/bengkelcoding.gif" alt="Bengkel Coding"><div class="guide-bubble"><span class="guide-name" id="guideName"></span><span class="guide-description" id="guideDescription"></span></div></div><div class="hint" id="hint" hidden><i></i><span></span></div></section>
+    <aside>
+      <div class="brand"><img src="assets/images/icon.png" alt=""> BENGKEL CODING <small class="badge">Akbar Aditiya S</small></div>
+      <div class="copy"><div class="eyebrow">RAKIT PC SIMULATOR</div><h2>Rakit PC<br><em>versi kamu.</em></h2><p>Tugas Arsitecture dan Organisasi Komputer Dengan dosen Bapak Muhammad Santoso</p></div>
+      <div><div class="label"><span>01</span> PILIH PRESET</div><label class="option active"><input type="radio" name="build" value="0" checked><i class="radio"></i><div><b>Mudah</b><small>Mudah dipasang dan render ringan.</small></div><span class="arrow">↗</span></label><label class="option"><input type="radio" name="build" value="1"><i class="radio"></i><div><b>Sedang</b><small>Sedang dan render sedang.</small></div><span class="arrow">↗</span></label><label class="option"><input type="radio" name="build" value="2"><i class="radio"></i><div><b>Sulit</b><small>Render berat.</small></div><span class="arrow">↗</span></label></div>
+      <div id="components" hidden><div class="label"><span>02</span> KOMPONEN / <strong id="buildName"></strong></div><div class="parts" id="parts"></div></div>
+      <div id="progress" hidden><div class="label"><span>03</span> PROGRESS <strong><span id="count">0</span>/<span id="total">9</span></strong></div><div class="track"><i id="bar" style="width:0"></i></div><p class="current" id="current"></p></div>
+      <div class="actions"><button class="primary" id="start">Mulai simulasi <span>→</span></button><button class="primary" id="next" hidden>Lanjutkan step <span>→</span></button><button class="secondary" id="inspect" hidden>Inspeksi model <span>◌</span></button><button class="reset" id="reset" hidden>Reset workspace</button></div>
+      <div class="foot"><button class="help" id="help">? &nbsp; Panduan singkat</button><span>Bengkel Coding @2026</span></div><div class="helpbox" id="helpbox" hidden><b>Cara bermain</b><p>Klik “Lanjutkan step” untuk memasukkan komponen satu per satu. Setelah selesai, gunakan Inspeksi untuk memutar model 3D.</p></div>
+    </aside>
+  </main>
+  <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"}}</script>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+    import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+    const canvas=document.querySelector('#scene'), scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(42,1,.1,100); camera.position.set(6,4.8,8);
+    const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true,powerPreference:'high-performance'}); renderer.setPixelRatio(Math.min(devicePixelRatio,1.25)); renderer.shadowMap.enabled=false;
+    const controls=new OrbitControls(camera,canvas); controls.enableDamping=true; controls.target.set(0,1.4,0);
+    scene.add(new THREE.HemisphereLight(0xe5f2df,0x20241f,2.4)); const key=new THREE.DirectionalLight(0xffffff,4); key.position.set(5,8,6); key.castShadow=true; scene.add(key);
+    const assetManager=new THREE.LoadingManager();
+    // Version all dependencies too: old Git LFS pointers may still be cached.
+    assetManager.setURLModifier(resource=>{
+      if (/^(data:|blob:)/i.test(resource)) return resource;
+      const url=new URL(resource,document.baseURI);
+      url.searchParams.set('v','restored-lfs-2');
+      return url.href;
+    });
+    const presets=[{"name":"Mudah","case":{"path":"case/nzxt","position":[0,-1,0],"scale":1,"rotation":[4.71238898038469,0,4.71238898038469]},"parts":[{"key":"motherboard","path":"mobo/asus_prime_h510m","target":[-0.8,0.75,-0.3],"scale":0.6,"rotation":[0,0,0]},{"key":"caseFan","path":"case-fan/white","target":[-1.86,1.34,1],"scale":0.3,"rotation":[0,0,1.5707963267948966]},{"key":"cpu","path":"cpu/intel-i5","target":[-0.54,1.1,-0.3],"scale":0.0027,"rotation":[0,0,3.141592653589793]},{"key":"memory1","path":"ram/kingston_hyperx_fury","target":[0.09,1.12,0],"scale":0.45,"rotation":[0,0,0]},{"key":"memory2","path":"ram/kingston_hyperx_fury","target":[0.214,1.12,0],"scale":0.45,"rotation":[0,0,0]},{"key":"storage","path":"storage/ssd_samsung_980_pro_1tb","target":[-1.062,0.343,-0.25],"scale":0.25,"rotation":[0,0,0]},{"key":"cpuFan","path":"cpu-fan/noname","target":[0.2,1,1.35],"scale":0.2,"rotation":[0,0,0]},{"key":"psu","path":"psu/low-poly","target":[-1.59,-1.88,1.25],"scale":0.5,"rotation":[1.5707963267948966,0,4.71238898038469]}]},{"name":"Sedang","case":{"path":"case/fractal","position":[0,0,-7],"scale":0.1,"rotation":[4.71238898038469,0,0]},"parts":[{"key":"motherboard","path":"mobo/ardor_gaming_b550m","target":[-1.672,1.973,-9],"scale":0.8,"rotation":[0,0,0]},{"key":"caseFan","path":"case-fan/corsair","target":[-4.75,1.2,-6.5],"scale":15,"rotation":[0,0,1.5707963267948966]},{"key":"cpu","path":"cpu/ryzen7","target":[-1.576,2.59,-8.8],"scale":0.1,"rotation":[0,0,3.141592653589793]},{"key":"memory1","path":"ram/corsair_dominator_rgb","target":[0.193,2.773,-7.75],"scale":0.75,"rotation":[0,0,0]},{"key":"memory2","path":"ram/corsair_dominator_rgb","target":[0.506,2.773,-7.75],"scale":0.75,"rotation":[0,0,0]},{"key":"storage","path":"storage/ssd_samsung_980_pro_1tb","target":[-2.025,0.191,-9],"scale":0.5,"rotation":[0,0,0]},{"key":"cpuFan","path":"cpu-fan/cooler_master","target":[-0.864,3.116,-4.8],"scale":1,"rotation":[0,0,4.71238898038469]},{"key":"gpu","path":"gpu/rtx_3060_ti_eagle","target":[-2.764,0,-8.8],"scale":1.25,"rotation":[0,0,4.71238898038469]},{"key":"psu","path":"psu/psu","target":[-2.9,-4,-7],"scale":0.035,"rotation":[4.71238898038469,0,1.5707963267948966]}]},{"name":"Sulit","case":{"path":"case/gaming","position":[0,-2,-2],"scale":1.2,"rotation":[4.71238898038469,0,1.5707963267948966]},"parts":[{"key":"motherboard","path":"mobo/asus-rog","target":[-1.3,0.522,-3],"scale":0.9,"rotation":[1.5707963267948966,0,0]},{"key":"caseFan","path":"case-fan/spectrum_argb","target":[-2.34,2.733,-1.75],"scale":0.8,"rotation":[0,0,0]},{"key":"cpu","path":"cpu/ryzen9","target":[-0.28,2.48,-3],"scale":0.1,"rotation":[0,0,0]},{"key":"memory1","path":"ram/g_skill_trident_z_neo","target":[0.546,2.5,-2.8],"scale":0.4,"rotation":[4.71238898038469,1.5707963267948966,3.141592653589793]},{"key":"memory2","path":"ram/g_skill_trident_z_neo","target":[0.746,2.5,-2.8],"scale":0.4,"rotation":[4.71238898038469,1.5707963267948966,3.141592653589793]},{"key":"storage","path":"storage/ssd_samsung_980_pro_1tb","target":[-0.811,1,-2.9],"scale":0.25,"rotation":[0,0,0]},{"key":"cpuFan","path":"cpu-fan/hyper_212_spectrum","target":[-0.054,2.45,-2],"scale":0.8,"rotation":[0,0,0]},{"key":"gpu","path":"gpu/rtx_3080","target":[-0.45,1.4,-2.2],"scale":1.5,"rotation":[3.141592653589793,0,4.71238898038469]},{"key":"psu","path":"psu/psu","target":[-1.15,-1.136,-2],"scale":0.02,"rotation":[4.71238898038469,0,1.5707963267948966]}]}];
+    const labels={motherboard:'Motherboard',caseFan:'Case Fan',cpu:'Processor (CPU)',memory1:'Memory (RAM)',memory2:'Memory (RAM) — stik kedua',storage:'Storage (SSD)',cpuFan:'CPU Cooler',gpu:'Graphics Card (GPU)',psu:'Power Supply (PSU)'};
+    const purposes={motherboard:'Papan utama yang menghubungkan prosesor, RAM, penyimpanan, dan kartu ekspansi.',caseFan:'Mengalirkan udara untuk membantu membuang panas dari dalam casing.',cpu:'Menjalankan instruksi dan perhitungan utama komputer.',memory1:'Menyimpan sementara data dan program yang sedang digunakan prosesor.',memory2:'Menambah kapasitas memori agar lebih banyak data aktif dapat diakses cepat.',storage:'Menyimpan sistem operasi, aplikasi, dan berkas secara permanen.',cpuFan:'Membuang panas dari prosesor agar suhunya tetap aman saat bekerja.',gpu:'Mengolah grafis dan mengirimkan tampilan ke monitor.',psu:'Mengubah listrik dari stopkontak menjadi daya yang dibutuhkan semua komponen.'};
+    const layer=new THREE.Group();scene.add(layer);
+    const loader=new GLTFLoader(assetManager);
+    let selected=0,step=0,running=false,loading=false,activePart=null,ghost=null,dragging=false,inspecting=false,annotationsVisible=false,installedParts=[],caseHeight=5,caseBounds=null;
+    const grabOffset=new THREE.Vector3();
+    const $=q=>document.querySelector(q), raycaster=new THREE.Raycaster(), pointer=new THREE.Vector2(), dragPlane=new THREE.Plane(new THREE.Vector3(0,0,1),0), dragPoint=new THREE.Vector3();
+    let renderReady=false;
+    const gl=renderer.getContext();
+    const viewportLimit=gl.getParameter(gl.MAX_VIEWPORT_DIMS);
+    const renderLimit=Math.min(2048,gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_TEXTURE_SIZE),...viewportLimit);
+    function resize(){
+      const {width,height}=canvas.parentElement.getBoundingClientRect();
+      renderReady=Number.isFinite(width)&&Number.isFinite(height)&&width>=1&&height>=1;
+      if(!renderReady)return;
+      const ratio=Math.min(window.devicePixelRatio||1,1.25,renderLimit/Math.max(width,height));
+      const w=Math.max(1,Math.floor(width*ratio)),h=Math.max(1,Math.floor(height*ratio));
+      if(canvas.width!==w||canvas.height!==h){renderer.setPixelRatio(1);renderer.setSize(w,h,false)}
+      camera.aspect=width/height;camera.updateProjectionMatrix();
+      renderReady=gl.drawingBufferWidth>0&&gl.drawingBufferHeight>0;
+    }
+    new ResizeObserver(resize).observe(canvas.parentElement);
+    addEventListener('resize',resize);resize();
+    function hint(text){$('#hint span').textContent=text}
+    let guideTimer;
+    function guideMessage(title,description){
+      clearTimeout(guideTimer);
+      $('#assemblyGuide').hidden=false;
+      $('#guideName').textContent=title;
+      $('#guideDescription').textContent=description;
+    }
+    function guide(spec){
+      $('#assemblyGuide').hidden=!spec;
+      if(!spec)return;
+      $('#guideName').textContent=labels[spec.key];
+      $('#guideDescription').textContent=purposes[spec.key];
+    }
+    function setBuild(){
+      $('#buildName').textContent=presets[selected].name;
+      $('#parts').replaceChildren(...presets[selected].parts.map(item=>{const el=document.createElement('span');el.textContent=labels[item.key];return el}));
+    }
+    function update(){
+      const parts=presets[selected].parts,complete=step===parts.length;
+      $('#count').textContent=step;$('#total').textContent=parts.length;
+      $('#bar').style.width=(step/parts.length*100)+'%';
+      $('#current').textContent=complete?'Rakitan selesai':labels[parts[step].key];
+      $('#next').hidden=!running||loading||!!activePart||complete;
+      $('#inspect').hidden=!running||!complete;
+    }
+    async function loadModel(spec){
+      loading=true;update();
+      try{
+        const gltf=await loader.loadAsync(new URL('assets/models/'+spec.path+'/scene.gltf',document.baseURI).href);
+        const root=gltf.scene.children[0];
+        if(!root)throw new Error('Model kosong');
+        // Preserve the original asset-specific assembly calibration; no equal-size normalization.
+        root.matrixAutoUpdate=true;root.position.set(...(spec.target||spec.position));root.rotation.set(...spec.rotation);root.scale.setScalar(spec.scale);
+        root.updateMatrixWorld(true);layer.add(root);return root;
+      }catch(error){console.error('Gagal memuat '+spec.path,error);hint('Model gagal dimuat. Coba kembali.');throw error}
+      finally{loading=false;update()}
+    }
+    function removeGhost(){
+      if(!ghost)return;scene.remove(ghost);
+      const materials=new Set();ghost.traverse(obj=>{if(obj.isMesh)materials.add(obj.material)});
+      materials.forEach(material=>material.dispose());ghost=null;
+    }
+    function showAnnotations(){
+      const labelsRoot=$('#annotationLabels'),svg=$('#annotationLines');
+      labelsRoot.replaceChildren();svg.replaceChildren();
+      installedParts.forEach(({spec,center})=>{
+        const card=document.createElement('div'),title=document.createElement('b'),description=document.createElement('span');
+        card.className='annotation';title.textContent=labels[spec.key];description.textContent=purposes[spec.key];
+        card.append(title,description);labelsRoot.append(card);card.userData={spec,center};
+      });
+      annotationsVisible=true;$('#annotations').hidden=false;layoutAnnotations();
+    }
+    function layoutAnnotations(){
+      if(!annotationsVisible)return;
+      const root=$('#annotations'),svg=$('#annotationLines'),rect=root.getBoundingClientRect(),width=rect.width,height=rect.height;
+      if(width<1||height<1)return;
+      svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.replaceChildren();
+      const sides=[[],[]],cards=[...$('#annotationLabels').children];
+      for(const card of cards){
+        const point=card.userData.center.clone().project(camera);
+        card.userData.point={x:(point.x+1)*width/2,y:(1-point.y)*height/2};
+        card.classList.toggle('left',point.x>0);card.classList.toggle('right',point.x<=0);
+        sides[point.x>0?0:1].push(card);
+      }
+      for(const group of sides){
+        group.sort((a,b)=>a.userData.point.y-b.userData.point.y);
+        const top=105,bottom=Math.max(top,height-32),gap=group.length>1?Math.min(76,(bottom-top)/(group.length-1)):0;
+        group.forEach((card,index)=>{card.style.top=`${Math.min(bottom,top+gap*index)}px`});
+      }
+      for(const card of cards){
+        const point=card.userData.point,anchorX=point.x,anchorY=point.y;
+        const edgeX=card.classList.contains('left')?12+card.offsetWidth:width-12-card.offsetWidth;
+        const edgeY=parseFloat(card.style.top);
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1',anchorX);line.setAttribute('y1',anchorY);line.setAttribute('x2',edgeX);line.setAttribute('y2',edgeY);svg.append(line);
+        const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.setAttribute('cx',anchorX);dot.setAttribute('cy',anchorY);dot.setAttribute('r','4');svg.append(dot);
+      }
+    }
+    function frameAssembly(){
+      const center=caseBounds.getCenter(new THREE.Vector3()),width=caseBounds.getSize(new THREE.Vector3()).x;
+      const distance=Math.max(caseHeight,(width+caseHeight*.9)/camera.aspect)/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)))*1.3;
+      controls.target.set(center.x-caseHeight*.3,center.y,center.z);
+      camera.position.set(controls.target.x,center.y,caseBounds.max.z+distance);camera.lookAt(controls.target);controls.update();
+    }
+    async function start(){
+      if(loading||running)return;
+      running=true;step=0;document.querySelectorAll('input[name=build]').forEach(input=>input.disabled=true);
+      $('#start').hidden=true;$('#reset').hidden=false;$('#components').hidden=false;$('#progress').hidden=false;$('#welcome').hidden=true;$('#hint').hidden=false;
+      setBuild();hint('Memuat case...');
+      try{
+        const root=await loadModel(presets[selected].case);caseBounds=new THREE.Box3().setFromObject(root);caseHeight=caseBounds.getSize(new THREE.Vector3()).y;
+        frameAssembly();guide(null);hint('Case siap. Klik Lanjutkan untuk motherboard.');update();
+      }catch{
+        running=false;$('#start').hidden=false;$('#next').hidden=true;document.querySelectorAll('input[name=build]').forEach(input=>input.disabled=false);
+      }
+    }
+    async function spawnPart(){
+      if(!running||loading||activePart||step>=presets[selected].parts.length)return;
+      clearTimeout(guideTimer);guide(null);
+      const spec=presets[selected].parts[step];hint('Memuat '+labels[spec.key]+'...');
+      try{
+        activePart=await loadModel(spec);
+        const target=new THREE.Vector3(...spec.target);
+        ghost=activePart.clone(true);
+        const green=new THREE.MeshBasicMaterial({color:0x50ff86,transparent:true,opacity:.35,depthWrite:false});
+        ghost.traverse(obj=>{if(obj.isMesh){obj.material=green;obj.renderOrder=2}});
+        scene.add(ghost);ghost.updateMatrixWorld(true);
+        const size=new THREE.Box3().setFromObject(activePart).getSize(new THREE.Vector3());
+        const start=target.clone();start.x-=caseHeight*.8;
+        activePart.position.copy(start);
+        activePart.userData={target,start,tolerance:Math.max(caseHeight*.015,Math.min(size.x,size.y)*.22)};
+        frameAssembly();controls.enabled=true;canvas.style.cursor='grab';guide(spec);update();
+        hint('Tarik '+labels[spec.key]+' ke siluet hijau pada dudukannya.');
+      }catch{activePart=null;update()}
+    }
+    function pointerPosition(event){
+      const r=canvas.getBoundingClientRect();pointer.x=((event.clientX-r.left)/r.width)*2-1;pointer.y=-((event.clientY-r.top)/r.height)*2+1;raycaster.setFromCamera(pointer,camera);
+    }
+    canvas.addEventListener('pointerdown',event=>{
+      if(!activePart||event.button!==0||!event.isPrimary)return;pointerPosition(event);
+      if(!raycaster.intersectObject(activePart,true).length)return;
+      const normal=camera.getWorldDirection(new THREE.Vector3());
+      dragPlane.setFromNormalAndCoplanarPoint(normal,activePart.userData.target);
+      if(!raycaster.ray.intersectPlane(dragPlane,dragPoint))return;
+      grabOffset.copy(activePart.position).sub(dragPoint);
+      grabOffset.addScaledVector(normal,-grabOffset.dot(normal));
+      event.stopImmediatePropagation();controls.enabled=false;
+      dragging=true;canvas.setPointerCapture(event.pointerId);canvas.style.cursor='grabbing';
+    },{capture:true});
+    canvas.addEventListener('pointermove',event=>{
+      if(!dragging||!activePart)return;pointerPosition(event);
+      if(raycaster.ray.intersectPlane(dragPlane,dragPoint))activePart.position.copy(dragPoint).add(grabOffset);
+    });
+    canvas.addEventListener('pointerup',event=>{
+      if(!dragging||!activePart)return;dragging=false;controls.enabled=true;
+      if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);
+      const {target,start,tolerance}=activePart.userData;
+      if(activePart.position.distanceTo(target)<=tolerance){
+        const installed=presets[selected].parts[step];
+        activePart.position.copy(target);
+        const installedBounds=new THREE.Box3().setFromObject(activePart);
+        installedParts.push({spec:installed,center:installedBounds.getCenter(new THREE.Vector3())});
+        activePart=null;removeGhost();step++;controls.enabled=true;canvas.style.cursor='default';guide(null);update();
+        if(step===presets[selected].parts.length){
+          guideMessage('Selamat! Rakitan selesai 🎉','Semua komponen berhasil terpasang. PC kamu siap untuk diperiksa!');
+          $('#assemblyGuide').classList.add('complete');
+          showAnnotations();
+        }else{
+          guideMessage('Yeay, berhasil terpasang! 🎉',labels[installed.key]+' sudah terpasang dengan benar. Klik Lanjutkan untuk komponen berikutnya.');
+          guideTimer=setTimeout(()=>guide(null),3500);
+        }
+        hint(step===presets[selected].parts.length?'Rakitan selesai. Drag untuk inspeksi 3D.':'Terpasang. Klik Lanjutkan untuk komponen berikutnya.');
+      }else{activePart.position.copy(start);canvas.style.cursor='grab';hint('Belum sejajar. Cocokkan komponen dengan siluet hijau.')}
+    });
+    canvas.addEventListener('pointercancel',event=>{
+      if(!dragging)return;dragging=false;controls.enabled=true;if(canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId);
+      activePart.position.copy(activePart.userData.start);canvas.style.cursor='grab';
+    });
+    document.querySelectorAll('input[name=build]').forEach(input=>input.addEventListener('change',event=>{
+      if(running)return;selected=Number(event.target.value);
+      document.querySelectorAll('.option').forEach(option=>option.classList.toggle('active',option.contains(event.target)));setBuild();update();
+    }));
+    $('#start').onclick=start;$('#next').onclick=spawnPart;
+    $('#inspect').onclick=()=>{
+      inspecting=!inspecting;
+      if(inspecting){
+        const center=caseBounds.getCenter(new THREE.Vector3()),size=caseBounds.getSize(new THREE.Vector3());
+        controls.enabled=true;controls.target.copy(center);
+        controls.minDistance=caseHeight*.45;controls.maxDistance=caseHeight*4;
+        camera.position.set(center.x+size.x*.55,center.y+caseHeight*.25,caseBounds.max.z+caseHeight*1.2);
+        controls.update();$('#inspect').textContent='Kembali ke rakitan';hint('Mode inspeksi: drag untuk memutar model, scroll untuk zoom.');
+      }else{
+        controls.minDistance=0;controls.maxDistance=Infinity;frameAssembly();
+        $('#inspect').textContent='Inspeksi model';hint('Kembali ke tampilan rakitan.');
+      }
+    };
+    $('#reset').onclick=()=>location.reload();$('#help').onclick=()=>$('#helpbox').hidden=!$('#helpbox').hidden;
+    setBuild();update();
+    let lastFrame=0;function animate(now=0){
+      requestAnimationFrame(animate);if(now-lastFrame<33||document.hidden||!renderReady||gl.isContextLost())return;
+      lastFrame=now;controls.update();renderer.render(scene,camera);layoutAnnotations();
+    }animate();
+  </script>
+</body>
+</html>
